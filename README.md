@@ -49,3 +49,27 @@ full name,email,job title
 - **Headers**: Must include `full name`, `email`, and `job title`.
 - **Pairing Logic**: Users are automatically paired sequentially (1st with 2nd, 3rd with 4th, etc.).
 - **Formatting**: Handles both `"LastName, FirstName"` and `"FirstName LastName"` formats for the `full name` field.
+
+## Deployment to Cloudflare Pages
+
+### Option 1: Git Integration (Recommended)
+1.  **Push your code** to a GitHub or GitLab repository.
+2.  Log in to the [Cloudflare Dashboard](https://dash.cloudflare.com/).
+3.  Go to **Workers & Pages** > **Create application** > **Pages** > **Connect to Git**.
+4.  Select your repository and use the following build settings:
+    - **Framework preset**: `Vite`
+    - **Build command**: `npm run build`
+    - **Build output directory**: `dist`
+5.  **Environment Variables**: 
+    - Go to **Settings** > **Environment variables**.
+    - Add `VITE_SHEET_CSV_URL` with your Google Sheets CSV URL.
+6.  Click **Save and Deploy**.
+
+### Option 2: Manual Deployment (Wrangler CLI)
+1.  Install Wrangler: `npm install -g wrangler`
+2.  Build the project: `npm run build`
+3.  Deploy: `npx wrangler pages deploy dist`
+4.  Set environment variable in the dashboard after the first deployment.
+
+> [!IMPORTANT]
+> Ensure your Google Sheet is **Published to the Web** as a **CSV** for the application to access the data.
