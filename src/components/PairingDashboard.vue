@@ -95,15 +95,16 @@ const updateTime = () => {
 };
 
 const currentSet = computed(() => {
-  const startDate = new Date('2026-03-11');
-  const targetDate = new Date();
+  // Use currentTime.value to make this computed reactive to time passing
+  // This ensures the dashboard updates automatically if left open past midnight
+  const now = new Date(currentTime.value);
+  const targetDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   targetDate.setDate(targetDate.getDate() + totalOffset.value);
   
-  // Reset time for accurate day calculation
-  const d1 = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-  const d2 = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
+  // Use local midnight for start date (March 11, 2026) to avoid timezone issues with ISO strings
+  const startDate = new Date(2026, 2, 11); 
   
-  const diffTime = d2 - d1;
+  const diffTime = targetDate - startDate;
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
   return startSetNumber + diffDays;
 });
