@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
+* {
+  box-sizing: border-box;
+}
+
 :root {
   --bg-color: #0d0d0d;
   --card-bg: #151515;
@@ -19,6 +23,7 @@ body {
   margin: 0;
   display: flex;
   justify-content: center;
+  align-items: center; /* Center horizontally and vertically */
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
@@ -26,12 +31,12 @@ body {
 #app {
   width: 100%;
   max-width: 900px;
-  padding: 4rem 2rem;
+  padding: 2rem;
   text-align: center;
 }
 
 h1 {
-  font-size: 3.5rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: var(--primary-green);
   margin-bottom: 0.5rem;
@@ -41,7 +46,7 @@ h1 {
 .subtitle {
   color: var(--secondary-green);
   font-size: 1.1rem;
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   opacity: 0.8;
   font-weight: 400;
 }
@@ -50,15 +55,15 @@ h1 {
   font-size: 1.8rem;
   font-weight: 600;
   color: var(--secondary-green);
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   letter-spacing: 0.1em;
 }
 
 .pairing-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  margin-bottom: 3rem;
+  gap: 1rem;
+  margin-bottom: 2rem;
 }
 
 .pairing-row {
@@ -66,7 +71,7 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 1rem 2rem;
+  padding: 0.5rem 2rem;
   transition: all 0.3s ease;
   border-radius: 12px;
 }
@@ -122,7 +127,7 @@ h1 {
 .divider {
   height: 1px;
   background: var(--border-color);
-  margin: 3rem 0;
+  margin: 1.5rem 0;
   width: 100%;
 }
 
@@ -134,7 +139,7 @@ h1 {
   color: var(--secondary-green);
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.9rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .footer-meta > span {
@@ -219,12 +224,12 @@ h1 {
 }
 
 .mini-arrow {
-  color: var(--border-color);
+  color: var(--text-secondary);
   font-weight: bold;
   font-family: 'JetBrains Mono', monospace;
   text-align: center;
   font-size: 0.75rem;
-  opacity: 0.6;
+  opacity: 0.3;
 }
 
 /* Loading & Error States */
