@@ -102,47 +102,52 @@ const currentSet = computed(() => {
   return startSetNumber + diffDays;
 });
 
-const pairings = computed(() => {
+const getPairingsForSet = (setNum) => {
   if (usersList.value.length === 0) return [];
   
   const users = [...usersList.value];
-  const offset = currentSet.value - startSetNumber;
-  
-  // Only apply rotation if we have exactly 6 users (3 pairs) as per requirements
-  if (users.length === 6) {
-    // Clockwise path: 0 -> 1 -> 3 -> 5 -> 4 -> 2 -> 0
-    const path = [0, 1, 3, 5, 4, 2];
-    const rotated = new Array(6);
-    
-    for (let i = 0; i < path.length; i++) {
-        // Find who moves to this position path[i]
-        // They came from path[(i - offset) % path.length]
-        const fromIdxInPath = ((i - offset) % path.length + path.length) % path.length;
-        rotated[path[i]] = users[path[fromIdxInPath]];
-    }
-    
-    const pairs = [];
-    for (let i = 0; i < rotated.length; i += 2) {
-      pairs.push({
-        user1: rotated[i],
-        user2: rotated[i + 1]
-      });
-    }
-    return pairs;
+  if (users.length % 2 !== 0) {
+    users.push({ 
+      'full name': import.meta.env.VITE_PLACEHOLDER_NAME || '-', 
+      email: import.meta.env.VITE_PLACEHOLDER_EMAIL || null 
+    });
   }
   
-  // Fallback for different number of users
+  const offset = setNum - startSetNumber;
+  const n = users.length;
+  
+  // Specific path for 6 users as requested previously
+  // Clockwise path: 0 -> 1 -> 3 -> 5 -> 4 -> 2 -> 0
+  let rotationPath = [];
+  if (n === 6) {
+    rotationPath = [0, 1, 3, 5, 4, 2];
+  } else {
+    // General logical path for any N: 0 -> 1 -> 3 -> ... -> (n-1) -> (n-2) -> ... -> 2 -> 0
+    rotationPath.push(0);
+    for (let i = 1; i < n; i += 2) rotationPath.push(i);
+    for (let i = (n % 2 === 0 ? n - 2 : n - 1); i >= 2; i -= 2) rotationPath.push(i);
+  }
+
+  const rotated = new Array(n);
+  for (let i = 0; i < rotationPath.length; i++) {
+    const targetIdx = rotationPath[i];
+    const fromIdxInPath = ((i - offset) % rotationPath.length + rotationPath.length) % rotationPath.length;
+    rotated[targetIdx] = users[rotationPath[fromIdxInPath]];
+  }
+
   const pairs = [];
-  for (let i = 0; i < users.length; i += 2) {
-    if (users[i] && users[i + 1]) {
-      pairs.push({
-        user1: users[i],
-        user2: users[i + 1]
-      });
-    }
+  for (let i = 0; i < rotated.length; i += 2) {
+    pairs.push({
+      user1: rotated[i],
+      user2: rotated[i + 1]
+    });
   }
   return pairs;
-});
+};
+
+const pairings = computed(() => getPairingsForSet(currentSet.value));
+const previousPairings = computed(() => getPairingsForSet(currentSet.value - 1));
+const nextPairings = computed(() => getPairingsForSet(currentSet.value + 1));
 
 const formattedDateTime = computed(() => {
   const displayDate = new Date(currentTime.value);
@@ -160,11 +165,47 @@ const formattedDateTime = computed(() => {
   }).replace(' at ', ' ');
 });
 
-const getGravatarUrl = (email) => {
+const getGravatarUrl = (email, size = 48) => {
   if (!email) return null;
   const hash = md5(email.trim().toLowerCase());
-  return `https://www.gravatar.com/avatar/${hash}?d=robohash&s=48`;
+  return `https://www.gravatar.com/avatar/${hash}?d=robohash&s=${size}`;
 };
+
+const prevLink = computed(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  let forward = parseInt(urlParams.get('f')) || 0;
+  let backward = parseInt(urlParams.get('b')) || 0;
+  
+  if (forward > 0) {
+    forward--;
+  } else {
+    backward++;
+  }
+  
+  const params = [];
+  if (forward > 0) params.push(`f=${forward}`);
+  if (backward > 0) params.push(`b=${backward}`);
+  
+  return params.length > 0 ? `?${params.join('&')}` : window.location.pathname;
+});
+
+const nextLink = computed(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  let forward = parseInt(urlParams.get('f')) || 0;
+  let backward = parseInt(urlParams.get('b')) || 0;
+  
+  if (backward > 0) {
+    backward--;
+  } else {
+    forward++;
+  }
+  
+  const params = [];
+  if (forward > 0) params.push(`f=${forward}`);
+  if (backward > 0) params.push(`b=${backward}`);
+  
+  return params.length > 0 ? `?${params.join('&')}` : window.location.pathname;
+});
 
 onMounted(() => {
   fetchPairings();
@@ -230,21 +271,31 @@ onMounted(() => {
       </div>
       
       <div class="footer-nav">
-        <div class="nav-item">
+        <a :href="prevLink" class="nav-item">
           <span class="nav-label">Previous</span>
-          <div class="coming-soon">
-            <span>coming soon</span>
-            <Box :size="20" :stroke-width="3" style="color: #2e7d32;" />
+          <div class="nav-pairings">
+            <div v-for="(pair, idx) in previousPairings" :key="idx" class="mini-pair">
+              <img :src="getGravatarUrl(pair.user1.email, 16)" class="mini-avatar" />
+              <span>{{ formatFirstName(pair.user1['full name']) }}</span>
+              <span class="mini-arrow">-></span>
+              <img :src="getGravatarUrl(pair.user2.email, 16)" class="mini-avatar" />
+              <span>{{ formatFirstName(pair.user2['full name']) }}</span>
+            </div>
           </div>
-        </div>
+        </a>
         
-        <div class="nav-item">
+        <a :href="nextLink" class="nav-item">
           <span class="nav-label">Next</span>
-          <div class="coming-soon">
-            <span>coming soon</span>
-            <Box :size="20" :stroke-width="3" style="color: #2e7d32;" />
+          <div class="nav-pairings">
+            <div v-for="(pair, idx) in nextPairings" :key="idx" class="mini-pair">
+              <img :src="getGravatarUrl(pair.user1.email, 16)" class="mini-avatar" />
+              <span>{{ formatFirstName(pair.user1['full name']) }}</span>
+              <span class="mini-arrow">-></span>
+              <img :src="getGravatarUrl(pair.user2.email, 16)" class="mini-avatar" />
+              <span>{{ formatFirstName(pair.user2['full name']) }}</span>
+            </div>
           </div>
-        </div>
+        </a>
       </div>
     </div>
   </div>
