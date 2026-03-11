@@ -26,6 +26,7 @@ body {
   align-items: center; /* Center horizontally and vertically */
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  background-color: var(--bg-color); /* Ensure background color covers everything */
 }
 
 #app {
@@ -279,4 +280,97 @@ h1 {
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  body {
+    align-items: flex-start;
+    padding: 1rem 0;
+  }
+
+  #app {
+    padding: 1.5rem 1rem;
+    max-width: 100%;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  .footer-nav {
+    gap: 4rem;
+  }
+}
+
+@media (max-width: 540px) {
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    padding: 0 1rem;
+  }
+
+  .today-label {
+    font-size: 1.3rem;
+  }
+
+  .pairing-row {
+    gap: 0.75rem;
+    padding: 0.5rem;
+  }
+
+  .pairing-row:hover {
+    transform: none; /* Disable scaling on mobile */
+  }
+
+  .person {
+    min-width: 0;
+    flex: 1;
+    gap: 0.5rem;
+  }
+
+  .name {
+    font-size: 1.1rem;
+  }
+
+  .avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .footer-meta {
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .footer-meta .separator {
+    display: none;
+  }
+
+  .github-link svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .footer-nav {
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .mini-pair {
+    grid-template-columns: 1fr 20px 30px 20px 1fr;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .mini-avatar {
+    width: 20px;
+    height: 20px;
+  }
 }

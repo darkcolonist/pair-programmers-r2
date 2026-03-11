@@ -240,9 +240,9 @@ onMounted(() => {
           <div class="nav-pairings">
             <div v-for="(pair, idx) in previousPairings" :key="idx" class="mini-pair">
               <span class="mini-name left">{{ formatFirstName(pair.user1['full name']) }}</span>
-              <img :src="getGravatarUrl(pair.user1.email, 16)" class="mini-avatar" />
+              <img :src="getGravatarUrl(pair.user1.email, 20)" class="mini-avatar" />
               <span class="mini-arrow">&lt;-&gt;</span>
-              <img :src="getGravatarUrl(pair.user2.email, 16)" class="mini-avatar" />
+              <img :src="getGravatarUrl(pair.user2.email, 20)" class="mini-avatar" />
               <span class="mini-name right">{{ formatFirstName(pair.user2['full name']) }}</span>
             </div>
           </div>
@@ -253,9 +253,9 @@ onMounted(() => {
           <div class="nav-pairings">
             <div v-for="(pair, idx) in nextPairings" :key="idx" class="mini-pair">
               <span class="mini-name left">{{ formatFirstName(pair.user1['full name']) }}</span>
-              <img :src="getGravatarUrl(pair.user1.email, 16)" class="mini-avatar" />
+              <img :src="getGravatarUrl(pair.user1.email, 20)" class="mini-avatar" />
               <span class="mini-arrow">&lt;-&gt;</span>
-              <img :src="getGravatarUrl(pair.user2.email, 16)" class="mini-avatar" />
+              <img :src="getGravatarUrl(pair.user2.email, 20)" class="mini-avatar" />
               <span class="mini-name right">{{ formatFirstName(pair.user2['full name']) }}</span>
             </div>
           </div>
