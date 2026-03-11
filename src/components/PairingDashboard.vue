@@ -171,42 +171,6 @@ const getGravatarUrl = (email, size = 48) => {
   return `https://www.gravatar.com/avatar/${hash}?d=robohash&s=${size}`;
 };
 
-const prevLink = computed(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  let forward = parseInt(urlParams.get('f')) || 0;
-  let backward = parseInt(urlParams.get('b')) || 0;
-  
-  if (forward > 0) {
-    forward--;
-  } else {
-    backward++;
-  }
-  
-  const params = [];
-  if (forward > 0) params.push(`f=${forward}`);
-  if (backward > 0) params.push(`b=${backward}`);
-  
-  return params.length > 0 ? `?${params.join('&')}` : window.location.pathname;
-});
-
-const nextLink = computed(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  let forward = parseInt(urlParams.get('f')) || 0;
-  let backward = parseInt(urlParams.get('b')) || 0;
-  
-  if (backward > 0) {
-    backward--;
-  } else {
-    forward++;
-  }
-  
-  const params = [];
-  if (forward > 0) params.push(`f=${forward}`);
-  if (backward > 0) params.push(`b=${backward}`);
-  
-  return params.length > 0 ? `?${params.join('&')}` : window.location.pathname;
-});
-
 onMounted(() => {
   fetchPairings();
   setInterval(updateTime, 1000);
@@ -271,31 +235,31 @@ onMounted(() => {
       </div>
       
       <div class="footer-nav">
-        <a :href="prevLink" class="nav-item">
+        <div class="nav-item">
           <span class="nav-label">Previous</span>
           <div class="nav-pairings">
             <div v-for="(pair, idx) in previousPairings" :key="idx" class="mini-pair">
+              <span class="mini-name left">{{ formatFirstName(pair.user1['full name']) }}</span>
               <img :src="getGravatarUrl(pair.user1.email, 16)" class="mini-avatar" />
-              <span>{{ formatFirstName(pair.user1['full name']) }}</span>
-              <span class="mini-arrow">-></span>
+              <span class="mini-arrow">&lt;-&gt;</span>
               <img :src="getGravatarUrl(pair.user2.email, 16)" class="mini-avatar" />
-              <span>{{ formatFirstName(pair.user2['full name']) }}</span>
+              <span class="mini-name right">{{ formatFirstName(pair.user2['full name']) }}</span>
             </div>
           </div>
-        </a>
+        </div>
         
-        <a :href="nextLink" class="nav-item">
+        <div class="nav-item">
           <span class="nav-label">Next</span>
           <div class="nav-pairings">
             <div v-for="(pair, idx) in nextPairings" :key="idx" class="mini-pair">
+              <span class="mini-name left">{{ formatFirstName(pair.user1['full name']) }}</span>
               <img :src="getGravatarUrl(pair.user1.email, 16)" class="mini-avatar" />
-              <span>{{ formatFirstName(pair.user1['full name']) }}</span>
-              <span class="mini-arrow">-></span>
+              <span class="mini-arrow">&lt;-&gt;</span>
               <img :src="getGravatarUrl(pair.user2.email, 16)" class="mini-avatar" />
-              <span>{{ formatFirstName(pair.user2['full name']) }}</span>
+              <span class="mini-name right">{{ formatFirstName(pair.user2['full name']) }}</span>
             </div>
           </div>
-        </a>
+        </div>
       </div>
     </div>
   </div>
