@@ -4,12 +4,21 @@ import Papa from 'papaparse';
 import { User, Repeat, Github, Box, Loader2, AlertCircle } from 'lucide-vue-next';
 import md5 from 'md5';
 
-const pairings = ref([]);
+const usersList = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 const sheetUrl = import.meta.env.VITE_SHEET_CSV_URL;
 const appTitle = import.meta.env.VITE_APP_TITLE || 'Pair Programmers';
 const currentTime = ref(new Date());
+
+const totalOffset = computed(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const forward = parseInt(urlParams.get('f')) || 0;
+  const backward = parseInt(urlParams.get('b')) || 0;
+  return forward - backward;
+});
+
+const startSetNumber = parseInt(import.meta.env.VITE_START_SET_NUMBER) || 640;
 
 const fetchPairings = async () => {
   isLoading.value = true;
@@ -43,16 +52,7 @@ const fetchPairings = async () => {
           return;
         }
 
-        const tempPairings = [];
-        for (let i = 0; i < users.length; i += 2) {
-          if (users[i] && users[i + 1]) {
-            tempPairings.push({
-              user1: users[i],
-              user2: users[i + 1]
-            });
-          }
-        }
-        pairings.value = tempPairings;
+        usersList.value = users;
         finishLoading(startTime);
       },
       error: (err) => {
@@ -88,22 +88,67 @@ const updateTime = () => {
   currentTime.value = new Date();
 };
 
-const getSetNumber = () => {
+const currentSet = computed(() => {
   const startDate = new Date('2026-03-11');
-  const today = new Date();
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() + totalOffset.value);
+  
   // Reset time for accurate day calculation
   const d1 = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
-  const d2 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const d2 = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate());
   
   const diffTime = d2 - d1;
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  return 640 + diffDays;
-};
+  return startSetNumber + diffDays;
+});
 
-const currentSet = computed(() => getSetNumber());
+const pairings = computed(() => {
+  if (usersList.value.length === 0) return [];
+  
+  const users = [...usersList.value];
+  const offset = currentSet.value - startSetNumber;
+  
+  // Only apply rotation if we have exactly 6 users (3 pairs) as per requirements
+  if (users.length === 6) {
+    // Clockwise path: 0 -> 1 -> 3 -> 5 -> 4 -> 2 -> 0
+    const path = [0, 1, 3, 5, 4, 2];
+    const rotated = new Array(6);
+    
+    for (let i = 0; i < path.length; i++) {
+        // Find who moves to this position path[i]
+        // They came from path[(i - offset) % path.length]
+        const fromIdxInPath = ((i - offset) % path.length + path.length) % path.length;
+        rotated[path[i]] = users[path[fromIdxInPath]];
+    }
+    
+    const pairs = [];
+    for (let i = 0; i < rotated.length; i += 2) {
+      pairs.push({
+        user1: rotated[i],
+        user2: rotated[i + 1]
+      });
+    }
+    return pairs;
+  }
+  
+  // Fallback for different number of users
+  const pairs = [];
+  for (let i = 0; i < users.length; i += 2) {
+    if (users[i] && users[i + 1]) {
+      pairs.push({
+        user1: users[i],
+        user2: users[i + 1]
+      });
+    }
+  }
+  return pairs;
+});
 
 const formattedDateTime = computed(() => {
-  return currentTime.value.toLocaleString('en-US', {
+  const displayDate = new Date(currentTime.value);
+  displayDate.setDate(displayDate.getDate() + totalOffset.value);
+  
+  return displayDate.toLocaleString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     second: '2-digit',
