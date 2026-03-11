@@ -1,12 +1,15 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import Papa from 'papaparse';
 import { User, Repeat, Github, Box, Loader2, AlertCircle } from 'lucide-vue-next';
+import md5 from 'md5';
 
 const pairings = ref([]);
 const isLoading = ref(true);
 const error = ref(null);
 const sheetUrl = import.meta.env.VITE_SHEET_CSV_URL;
+const appTitle = import.meta.env.VITE_APP_TITLE || 'Pair Programmers';
+const currentTime = ref(new Date());
 
 const fetchPairings = async () => {
   isLoading.value = true;
@@ -81,8 +84,46 @@ const formatFirstName = (fullName) => {
   return fullName.split(' ')[0];
 };
 
+const updateTime = () => {
+  currentTime.value = new Date();
+};
+
+const getSetNumber = () => {
+  const startDate = new Date('2026-03-11');
+  const today = new Date();
+  // Reset time for accurate day calculation
+  const d1 = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const d2 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  
+  const diffTime = d2 - d1;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  return 640 + diffDays;
+};
+
+const currentSet = computed(() => getSetNumber());
+
+const formattedDateTime = computed(() => {
+  return currentTime.value.toLocaleString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true,
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+  }).replace(' at ', ' ');
+});
+
+const getGravatarUrl = (email) => {
+  if (!email) return null;
+  const hash = md5(email.trim().toLowerCase());
+  return `https://www.gravatar.com/avatar/${hash}?d=robohash&s=48`;
+};
+
 onMounted(() => {
   fetchPairings();
+  setInterval(updateTime, 1000);
 });
 </script>
 
@@ -104,7 +145,7 @@ onMounted(() => {
 
     <!-- Dashboard Content -->
     <div v-else>
-      <h1>Pair Programmers</h1>
+      <h1>{{ appTitle }}</h1>
       <p class="subtitle">Let the coding begin and may the odds be ever in your favor!</p>
       
       <div class="today-label">TODAY</div>
@@ -114,7 +155,8 @@ onMounted(() => {
           <div class="person left">
             <span class="name">{{ formatFirstName(pair.user1['full name']) }}</span>
             <div class="avatar">
-              <User :size="24" />
+              <img v-if="pair.user1.email" :src="getGravatarUrl(pair.user1.email)" alt="Avatar" class="avatar-img" />
+              <User v-else :size="24" />
             </div>
           </div>
           
@@ -122,7 +164,8 @@ onMounted(() => {
           
           <div class="person right">
             <div class="avatar">
-              <User :size="24" />
+              <img v-if="pair.user2.email" :src="getGravatarUrl(pair.user2.email)" alt="Avatar" class="avatar-img" />
+              <User v-else :size="24" />
             </div>
             <span class="name">{{ formatFirstName(pair.user2['full name']) }}</span>
           </div>
@@ -132,16 +175,13 @@ onMounted(() => {
       <div class="divider"></div>
       
       <div class="footer-meta">
-        <span>Season 128</span>
+        <span>Set {{ currentSet }}</span>
         <div class="separator"></div>
-        <span>Set 640</span>
+        <span>{{ formattedDateTime }}</span>
         <div class="separator"></div>
-        <span>7:00am Friday, March 06, 2026</span>
-        <div class="separator"></div>
-        <div class="build-tag">
-          <Github :size="14" />
-          <span>build 4466...1ac3</span>
-        </div>
+        <a href="https://github.com/darkcolonist/pair-programmers-r2" target="_blank" class="github-link">
+          <Github :size="16" />
+        </a>
       </div>
       
       <div class="footer-nav">
@@ -164,6 +204,7 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
 
 <style scoped>
 /* Scoped styles if needed, though most are in style.css */
