@@ -1,19 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Space+Grotesk:wght@300..700&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
 
 * {
   box-sizing: border-box;
 }
 
 :root {
-  --bg-color: #0d0d0d;
-  --card-bg: #151515;
+  --bg-color: #030712;
+  --card-bg: rgba(15, 23, 42, 0.6);
   --primary-green: #4ade80;
   --secondary-green: #22c55e;
-  --text-primary: #e5e5e5;
-  --text-secondary: #a3a3a3;
-  --border-color: #262626;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: rgba(51, 65, 85, 0.5);
+  --accent-glow: rgba(74, 222, 128, 0.05);
   
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Outfit', system-ui, -apple-system, sans-serif;
   background-color: var(--bg-color);
   color: var(--text-primary);
   line-height: 1.6;
@@ -23,25 +24,33 @@ body {
   margin: 0;
   display: flex;
   justify-content: center;
-  align-items: center; /* Center horizontally and vertically */
+  align-items: center;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
-  background-color: var(--bg-color); /* Ensure background color covers everything */
+  /* Premium Deep Gradient */
+  background: radial-gradient(120% 120% at 50% 10%, #111827 0%, #030712 100%);
+  position: relative;
+  overflow-x: hidden;
 }
+
 
 #app {
   width: 100%;
   max-width: 900px;
   padding: 2rem;
   text-align: center;
+  position: relative;
+  z-index: 1;
 }
 
 h1 {
-  font-size: 2.5rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 3rem;
   font-weight: 700;
   color: var(--primary-green);
   margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
+  text-shadow: 0 0 20px rgba(74, 222, 128, 0.2);
 }
 
 .subtitle {
@@ -53,11 +62,14 @@ h1 {
 }
 
 .today-label {
+  font-family: 'Space Grotesk', sans-serif;
   font-size: 1.8rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--secondary-green);
-  margin-bottom: 1rem;
-  letter-spacing: 0.1em;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.9;
 }
 
 .pairing-container {
@@ -72,14 +84,19 @@ h1 {
   align-items: center;
   justify-content: center;
   gap: 2rem;
-  padding: 0.5rem 2rem;
-  transition: all 0.3s ease;
-  border-radius: 12px;
+  padding: 0.8rem 2.5rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid transparent;
 }
 
 .pairing-row:hover {
   background: var(--card-bg);
-  transform: scale(1.02);
+  backdrop-filter: blur(8px);
+  border-color: var(--border-color);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
 .person {
@@ -99,7 +116,8 @@ h1 {
 
 .name {
   font-size: 1.4rem;
-  font-weight: 500;
+  font-weight: 600;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .avatar {
@@ -127,9 +145,24 @@ h1 {
 
 .divider {
   height: 1px;
-  background: var(--border-color);
-  margin: 1.5rem 0;
+  background: linear-gradient(90deg, transparent, var(--border-color) 20%, var(--border-color) 80%, transparent);
+  margin: 2rem 0;
   width: 100%;
+  position: relative;
+}
+
+.divider::after {
+  content: "////";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--bg-color);
+  padding: 0 1rem;
+  color: var(--border-color);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.2rem;
 }
 
 .footer-meta {
@@ -179,11 +212,13 @@ h1 {
 }
 
 .nav-label {
+  font-family: 'Space Grotesk', sans-serif;
   color: var(--secondary-green);
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
 }
 
 .nav-pairings {
@@ -200,7 +235,7 @@ h1 {
   gap: 0.5rem;
   color: var(--text-secondary);
   font-size: 0.85rem;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Outfit', sans-serif;
 }
 
 .mini-name {
@@ -282,6 +317,20 @@ h1 {
   cursor: pointer;
 }
 
+/* Background simple dots */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: -1;
+}
+
 /* Responsive Styles */
 @media (max-width: 768px) {
   body {
@@ -295,7 +344,7 @@ h1 {
   }
 
   h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
   }
 
   .footer-nav {
@@ -305,21 +354,22 @@ h1 {
 
 @media (max-width: 540px) {
   h1 {
-    font-size: 1.75rem;
+    font-size: 1.8rem;
   }
 
   .subtitle {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     padding: 0 1rem;
   }
 
   .today-label {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
+    letter-spacing: 0.2rem;
   }
 
   .pairing-row {
     gap: 0.75rem;
-    padding: 0.5rem;
+    padding: 0.8rem 0.5rem;
   }
 
   .pairing-row:hover {
@@ -333,7 +383,7 @@ h1 {
   }
 
   .name {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
 
   .avatar {
@@ -364,7 +414,7 @@ h1 {
   .mini-pair {
     grid-template-columns: 1fr 20px 30px 20px 1fr;
     gap: 0.4rem;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     width: 100%;
     max-width: 320px;
   }
