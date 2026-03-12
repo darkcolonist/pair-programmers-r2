@@ -1,0 +1,31 @@
+name: Daily Discord Pairing Notification
+
+on:
+  schedule:
+    # Runs at 23:00 UTC every Sunday-Thursday, which is 7:00 AM SGT (UTC+8) Monday-Friday
+    - cron: '0 23 * * 0-4'
+  workflow_dispatch: # Allows manual trigger for testing
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install papaparse md5
+
+      - name: Run notification script
+        env:
+          VITE_SHEET_CSV_URL: ${{ secrets.VITE_SHEET_CSV_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          VITE_APP_URL: ${{ vars.VITE_APP_URL || 'https://darkcolonist.github.io/pair-programmers-r2/' }}
+          VITE_START_SET_NUMBER: ${{ vars.VITE_START_SET_NUMBER || '640' }}
+          VITE_APP_TITLE: ${{ vars.VITE_APP_TITLE || 'Pair Programmers' }}
+        run: node scripts/discord-notify.js
