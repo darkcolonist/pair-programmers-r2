@@ -110,46 +110,52 @@ async function run() {
                 console.log(`Calculated pairings for Set ${currentSetNum}`);
 
                 const now = new Date();
+                const timeZone = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' })
+                    .formatToParts(now)
+                    .find(part => part.type === 'timeZoneName').value;
+
                 const todayFormatted = now.toLocaleDateString('en-US', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
                 });
-                const timeStr = "7:00am"; // As requested in the format
+                const timeStr = `7:00am ${timeZone}`; // As requested with timezone
 
-                // Helper to center text in a field
-                const centerText = (text, width) => {
-                    const pad = width - text.length;
-                    if (pad <= 0) return text.substring(0, width);
-                    const left = Math.floor(pad / 2);
-                    const right = pad - left;
-                    return ' '.repeat(left) + text + ' '.repeat(right);
-                };
-
-                const col1Width = 15;
-                const col2Width = 14;
-                const separator = `+${'-'.repeat(col1Width)}+${'-'.repeat(col2Width)}+`;
-                const emptyRow = `|${' '.repeat(col1Width)}|${' '.repeat(col2Width)}|`;
-
-                let table = `🚀 **Good morning!** Here are today's pair programmers for **Set ${currentSetNum}** (**${todayFormatted} ${timeStr}**).\n\n`;
-                table += `\`\`\`\n`;
-                table += separator + '\n';
+                // --- Programmer Oriented Terminal Style ---
+                const col1Width = 12;
+                const col2Width = 12;
                 
-                pairings.forEach(pair => {
-                    const name1 = formatFirstName(pair.user1['full name']);
-                    const name2 = formatFirstName(pair.user2['full name']);
-                    table += emptyRow + '\n';
-                    table += `|${centerText(name1, col1Width)}|${centerText(name2, col2Width)}|\n`;
-                    table += emptyRow + '\n';
-                    table += separator + '\n';
+                const localDate = now.toLocaleDateString('en-CA'); // YYYY-MM-DD in local time
+                let terminalOutput = `\`\`\`ansi\n`;
+                terminalOutput += `\u001b[1;32m$ get-pairings --set ${currentSetNum} --date "${localDate}" --tz "${timeZone}"\u001b[0m\n`;
+                terminalOutput += `\u001b[1;30m--------------------------------------\u001b[0m\n`;
+                
+                pairings.forEach((pair, index) => {
+                    const name1 = formatFirstName(pair.user1['full name']).padEnd(col1Width);
+                    const name2 = formatFirstName(pair.user2['full name']).padEnd(col2Width);
+                    const pairNum = (index + 1).toString().padStart(2, '0');
+                    terminalOutput += `\u001b[1;34m[${pairNum}]\u001b[0m  ${name1} \u001b[1;30m<->\u001b[0m  ${name2}\n`;
                 });
-                table += `\`\`\`\nView Dashboard: ${APP_URL}`;
+                
+                terminalOutput += `\u001b[1;30m--------------------------------------\u001b[0m\n`;
+                terminalOutput += `\u001b[1;32m[SUCCESS]\u001b[0m Pairing protocol synchronized.\n`;
+                terminalOutput += `\`\`\``;
 
                 const discordPayload = {
                     username: APP_TITLE,
-                    avatar_url: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/users.png',
-                    content: table
+                    avatar_url: 'https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/terminal.png',
+                    embeds: [{
+                        title: `Pairing Protocol: Set ${currentSetNum}`,
+                        description: `**Environment:** \`production\`\n**Endpoint:** ${APP_URL}\n**Timestamp:** \`${todayFormatted} ${timeStr}\`\n\n${terminalOutput}`,
+                        color: 0x2ecc71, // Green
+                        url: APP_URL,
+                        footer: {
+                            text: `System Status: Active | TZ: ${timeZone}`,
+                            icon_url: 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png'
+                        },
+                        timestamp: new Date().toISOString()
+                    }]
                 };
 
                 console.log('Sending to Discord...');
