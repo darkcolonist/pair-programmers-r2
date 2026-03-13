@@ -31,5 +31,5 @@ jobs:
           VITE_APP_URL: ${{ vars.VITE_APP_URL || 'https://darkcolonist.github.io/pair-programmers-r2/' }}
           VITE_START_SET_NUMBER: ${{ vars.VITE_START_SET_NUMBER || '640' }}
           VITE_APP_TITLE: ${{ vars.VITE_APP_TITLE || 'Pair Programmers' }}
-          TZ: 'Asia/Singapore'
+          TZ: 'Asia/Manila'
         run: node scripts/discord-notify.js
