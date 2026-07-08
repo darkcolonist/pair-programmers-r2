@@ -3,6 +3,7 @@ name: Keepalive Workflow
 on:
   schedule:
     - cron: '0 0 1 * *' # Runs once a month on the 1st
+  workflow_dispatch: # the manual trigger button
 
 jobs:
   keepalive:
