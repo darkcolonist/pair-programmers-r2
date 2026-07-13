@@ -2,8 +2,8 @@ name: Daily Discord Pairing Notification
 
 on:
   schedule:
-    # Runs at 23:00 UTC every Sunday-Thursday, which is 7:00 AM SGT (UTC+8) Monday-Friday
-    - cron: '0 23 * * 0-4'
+    # Runs at 22:00 UTC every Sunday-Thursday, which is 7:00 AM SGT (UTC+8) Monday-Friday
+    - cron: '0 22 * * 0-4'
   workflow_dispatch: # Allows manual trigger for testing
 
 env:
